@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "list": "nodemon good.js",
+    "antonio": "json-server --watch src/name.json --port 7788",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
