@@ -2,7 +2,8 @@ const {
     GraphQLSchema, 
     GraphQLObjectType,
     GraphQLString,
-    GraphQLInt
+    GraphQLInt,
+    GraphQLNonNull
 } = require('graphql')
 const axios = require('axios')
 
@@ -24,7 +25,7 @@ const NameType = new GraphQLObjectType({
     })
 })
 
-const DoubleBloodyMarry = new GraphQLObjectType({
+const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
     fields: {
         names: {
@@ -32,13 +33,11 @@ const DoubleBloodyMarry = new GraphQLObjectType({
             args: {
                 id: {
                     type: GraphQLInt
-                }
+                },
             },
-            resolve: (previousValue, {id}) => {
-                return axios
-                    .get(`http://localhost:7788/names/${id}`)
-                    .then(({data}) => data)
-            }
+            resolve: (previousValue, {id}) => axios
+                .get(`http://localhost:7788/names/${id}`)
+                .then(({data}) => data)
         }
     }
 })
@@ -50,32 +49,30 @@ const mutation = new GraphQLObjectType({
             type: NameType,
             args: {
                 first: {
-                    type: GraphQLString
+                    type: new GraphQLNonNull(GraphQLString)
                 },
                 middle: {
                     type: GraphQLString
                 },
                 last: {
-                    type: GraphQLString
+                    type: new GraphQLNonNull(GraphQLString)
                 }
             },
-            resolve: (previousValue, {first, last}) => {
-                axios
-                    .post(`http://localhost:7788/names`, {
-                        first,
-                        last
-                    })
-                    .then(({data}) => {
-                        console.log('***********************')
-                        console.log(data)
-                        return data
-                    })
-            }
+            resolve: (previousValue, {first, last}) => axios
+                .post(`http://localhost:7788/names`, {
+                    first,
+                    last
+                })
+                .then(({data}) => {
+                    console.log('***********************')
+                    console.log(data)
+                    return data
+                })
         }
     })
 })
 
 module.exports = new GraphQLSchema({
-    query: DoubleBloodyMarry,
+    query: RootQuery,
     mutation,
 })
